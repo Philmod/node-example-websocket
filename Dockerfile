@@ -1,4 +1,4 @@
-FROM node:6.3.0
+FROM zzrot/alpine-node
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

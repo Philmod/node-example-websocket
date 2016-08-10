@@ -1,4 +1,11 @@
-var io = require('socket.io')(3002);
+var app = require('express')();
+var serverStatus = require('express-server-status');
+
+app.use('/status', serverStatus(app));
+
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
 var redis = require('socket.io-redis');
 
 var adapter = redis({
@@ -13,6 +20,9 @@ io.adapter(adapter);
 
 io.on('connection', function(socket) {
   socket.on('chat message', function(msg) {
+    console.log('Message in : ', msg);
     io.emit('chat message', msg);
   });
 });
+
+server.listen(3002);
