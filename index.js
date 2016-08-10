@@ -1,3 +1,4 @@
+var os = require("os");
 var app = require('express')();
 var serverStatus = require('express-server-status');
 
@@ -19,9 +20,12 @@ adapter.subClient.on('error', errFn);
 io.adapter(adapter);
 
 io.on('connection', function(socket) {
-  socket.on('chat message', function(msg) {
-    console.log('Message in : ', msg);
-    io.emit('chat message', msg);
+  socket.on('chat message', function(content) {
+    console.log('Message in : ', content);
+    io.emit('chat message', {
+      hostname: os.hostname(),
+      content: content
+    });
   });
 });
 
