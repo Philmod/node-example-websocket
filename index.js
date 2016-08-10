@@ -3,7 +3,7 @@ var morgan = require('morgan');
 var app = require('express')();
 var serverStatus = require('express-server-status');
 
-app.use(morgan('dev');
+app.use(morgan('dev'));
 app.use('/status', serverStatus(app));
 
 var server = require('http').createServer(app);
