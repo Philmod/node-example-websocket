@@ -23,12 +23,11 @@ io.adapter(adapter);
 
 io.on('connection', function(socket) {
   console.log('Connection : ', new Date());
+  io.emit('hostname', os.hostname());
+
   socket.on('chat message', function(content) {
     console.log('Message in : ', content);
-    io.emit('chat message', {
-      hostname: os.hostname(),
-      content: content
-    });
+    io.emit('chat message', content);
   });
 });
 
