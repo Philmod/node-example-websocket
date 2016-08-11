@@ -15,6 +15,10 @@ var adapter = redis({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT
 });
+console.log('hey redis : ', {
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT
+});
 var errFn = function(err) { console.error(err); }
 adapter.pubClient.on('error', errFn);
 adapter.subClient.on('error', errFn);
@@ -23,7 +27,7 @@ io.adapter(adapter);
 
 io.on('connection', function(socket) {
   console.log('Connection : ', new Date());
-  io.emit('hostname', os.hostname());
+  socket.emit('hostname', os.hostname());
 
   socket.on('chat message', function(content) {
     console.log('Message in : ', content);
