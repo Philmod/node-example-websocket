@@ -14,8 +14,8 @@ var io = require('socket.io')(server, {
 var redis = require('socket.io-redis');
 
 var adapter = redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: process.env.REDIS_PORT || 6379
+  host: process.env.REDIS_MASTER_SERVICE_HOST || 'localhost',
+  port: process.env.REDIS_MASTER_SERVICE_PORT || 6379
 });
 var errFn = function(err) { console.error(err); }
 adapter.pubClient.on('error', errFn);
