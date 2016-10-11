@@ -1,6 +1,6 @@
 {
   "name": "node-example-websocket",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "websocket server",
   "dependencies": {
     "express": "^4.14.0",
