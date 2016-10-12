@@ -8,7 +8,7 @@ app.use('/status', serverStatus(app));
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server, {
-  path: process.env.WEBSOCKET_PATH | 'socket.io'
+  path: process.env.WEBSOCKET_PATH || 'socket.io'
 });
 
 var redis = require('socket.io-redis');
