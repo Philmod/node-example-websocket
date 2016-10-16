@@ -8,33 +8,56 @@ app.use('/status', serverStatus(app));
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server, {
-  path: process.env.WEBSOCKET_PATH || 'socket.io'
+  path: process.env.WEBSOCKET_PATH || '/socket.io'
 });
 
-var redis = require('socket.io-redis');
-
-var adapter = redis({
+// Redis.
+var redisOptions = {
   host: process.env.REDIS_SERVICE_HOST || 'localhost',
   port: process.env.REDIS_SERVICE_PORT || 6379
-});
+};
+var redis = require('redis').createClient(redisOptions);
+
+// Redis Adapter.
+var adapter = require('socket.io-redis')(redisOptions);
 var errFn = function(err) { console.error(err); }
 adapter.pubClient.on('error', errFn);
 adapter.subClient.on('error', errFn);
-
 io.adapter(adapter);
 
+// Messages storage.
+var messagesListMax = process.env.MESSAGES_LIST_MAX || 10;
+var messagesListName = process.env.MESSAGES_LIST_NAME || 'node-example-messages';
+
+// Websockets.
 io.on('connection', function(socket) {
   var addedUser = false;
   var hostname = os.hostname();
   console.log('Connection : ', new Date());
   socket.emit('hostname', hostname);
 
+  socket.on('login', function() {
+    redis.lrange(messagesListName, 0, -1, function(err, messages) {
+      if (err) console.error(err);
+      else {
+        messages.forEach(function(message) {
+          var m = JSON.parse(message);
+          if (m.username && m.message) {
+              socket.emit('new_message', m);
+          }
+        });
+      }
+    });
+  })
+
   socket.on('new_message', function(message) {
-    console.log('Message in : ', message);
-    io.emit('new_message', {
+    var fullMessage = {
       username: socket.username,
       message: message,
-    });
+    };
+    io.emit('new_message', fullMessage);
+    redis.rpush(messagesListName, JSON.stringify(fullMessage));
+    redis.ltrim(messagesListName, -messagesListMax, -1)
   });
 
   socket.on('add_user', function(username) {
