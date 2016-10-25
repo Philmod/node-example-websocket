@@ -13,7 +13,7 @@ var io = require('socket.io')(server, {
 
 // Redis.
 var redisOptions = {
-  host: process.env.REDIS_SERVICE_HOST || 'localhost',
+  host: process.env.REDIS_SERVICE_HOST || process.env.REDIS_PORT_6379_TCP_ADDR || 'localhost',
   port: process.env.REDIS_SERVICE_PORT || 6379
 };
 var redis = require('redis').createClient(redisOptions);
