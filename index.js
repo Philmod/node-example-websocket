@@ -79,4 +79,4 @@ io.on('connection', function(socket) {
 });
 
 server.listen(3002);
-console.log('socket.io listening on *:3002');
+console.log('socket.io server listening on *:3002, running on node %s', process.version);
