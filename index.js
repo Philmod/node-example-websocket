@@ -18,15 +18,15 @@ var redisOptions = {
 };
 var redis = require('redis');
 var client = redis.createClient(redisOptions);
-client.on('error', function(err) {
+var errFn = function(err) {
   throw new Error('Redis error ' + err);
-});
+}
+client.on('error', errFn);
 
 // Redis Adapter.
-var adapter = require('socket.io-redis')({
-  pubClient: client,
-  subClient: client,
-});
+var adapter = require('socket.io-redis')(redisOptions);
+adapter.pubClient.on('error', errFn);
+adapter.subClient.on('error', errFn);
 io.adapter(adapter);
 
 // Messages storage.
