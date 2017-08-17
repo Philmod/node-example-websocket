@@ -18,15 +18,16 @@ var redisOptions = {
 };
 var redis = require('redis');
 var client = redis.createClient(redisOptions);
-client.on('error', function (err) {
-    console.log('Redis error ' + err);
-    client = redis.createClient(redisOptions);
-    console.log('Redis client re-initialized.')
-});
+var errFn = function(err) {
+  console.log('Redis error ' + err);
+  client.end(true);
+  client = redis.createClient(redisOptions);
+  console.log('Redis client re-initialized.');
+}
+client.on('error', errFn);
 
 // Redis Adapter.
 var adapter = require('socket.io-redis')(redisOptions);
-var errFn = function(err) { console.error(err); }
 adapter.pubClient.on('error', errFn);
 adapter.subClient.on('error', errFn);
 io.adapter(adapter);
