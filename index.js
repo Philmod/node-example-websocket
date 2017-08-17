@@ -20,9 +20,8 @@ var redis = require('redis');
 var client = redis.createClient(redisOptions);
 var errFn = function(err) {
   console.log('Redis error ' + err);
-  client.end(true);
-  client = redis.createClient(redisOptions);
-  console.log('Redis client re-initialized.');
+  console.log('Exiting...')
+  process.exit();
 }
 client.on('error', errFn);
 
