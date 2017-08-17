@@ -1,4 +1,4 @@
-var os = require("os");
+var os = require('os');
 var morgan = require('morgan');
 var app = require('express')();
 var serverStatus = require('express-server-status');
@@ -16,7 +16,13 @@ var redisOptions = {
   host: process.env.REDIS_SERVICE_HOST || process.env.REDIS_PORT_6379_TCP_ADDR || 'localhost',
   port: process.env.REDIS_SERVICE_PORT || 6379
 };
-var redis = require('redis').createClient(redisOptions);
+var redis = require('redis');
+var client = redis.createClient(redisOptions);
+client.on('error', function (err) {
+    console.log('Redis error ' + err);
+    client = redis.createClient(redisOptions);
+    console.log('Redis client re-initialized.')
+});
 
 // Redis Adapter.
 var adapter = require('socket.io-redis')(redisOptions);
@@ -37,7 +43,7 @@ io.on('connection', function(socket) {
   socket.emit('hostname', hostname);
 
   socket.on('login', function() {
-    redis.lrange(messagesListName, 0, -1, function(err, messages) {
+    client.lrange(messagesListName, 0, -1, function(err, messages) {
       if (err) console.error(err);
       else {
         messages.forEach(function(message) {
@@ -56,8 +62,8 @@ io.on('connection', function(socket) {
       message: message,
     };
     io.emit('new_message', fullMessage);
-    redis.rpush(messagesListName, JSON.stringify(fullMessage));
-    redis.ltrim(messagesListName, -messagesListMax, -1)
+    client.rpush(messagesListName, JSON.stringify(fullMessage));
+    client.ltrim(messagesListName, -messagesListMax, -1)
   });
 
   socket.on('add_user', function(username) {
